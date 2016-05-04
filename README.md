@@ -25,4 +25,3 @@ Report the status of all available sites
 $ terminus sites status --env=dev
 ```
 Report the status of the dev environment only of all available sites
-```
