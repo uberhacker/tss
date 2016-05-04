@@ -1,0 +1,9 @@
+{
+  "name": "uberhacker/tss",
+  "description": "Terminus plugin to report the status of all available Pantheon sites",
+  "homepage": "https://github.com/uberhacker/tss",
+  "license": "MIT",
+  "require": {
+    "php": ">=5.4"
+  },
+}
