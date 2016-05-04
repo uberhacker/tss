@@ -38,7 +38,7 @@ class SitesStatusCommand extends TerminusCommand {
    *   and also is the basis for loading individual sites by name
    *
    * [--env=<env>]
-   * : Filter sites by environment.  Use 'all' or exclude to get all.
+   * : Filter sites by environment.
    *
    * [--team]
    * : Filter for sites you are a team member of
