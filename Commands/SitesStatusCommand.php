@@ -121,7 +121,7 @@ class SitesStatusCommand extends TerminusCommand {
     $site_rows = array();
     $site_labels = [
       'name'            => 'Name',
-      'service_level'   => 'Service Level',
+      'service_level'   => 'Service',
       'framework'       => 'Framework',
       'created'         => 'Created',
       'frozen'          => 'Frozen',
@@ -130,9 +130,11 @@ class SitesStatusCommand extends TerminusCommand {
     $env_rows = array();
     $env_labels = [
       'name'            => 'Name',
-      'environment'     => 'Environment',
-      'php_version'     => 'PHP Version',
-      'connection_mode' => 'Connection Mode',
+      'environment'     => 'Env',
+      'php_version'     => 'PHP',
+      'drush_version'   => 'Drush',
+      'newrelic'        => 'New Relic',
+      'connection_mode' => 'Mode',
       'condition'       => 'Condition',
     ];
 
@@ -299,10 +301,15 @@ class SitesStatusCommand extends TerminusCommand {
       }
     }
 
+    $data = $site->newRelic();
+    $newrelic = !empty($data->account) ? 'enabled' : 'disabled';
+
     $env_rows[] = [
       'name'            => $name,
       'environment'     => $environ,
       'php_version'     => $env->info('php_version'),
+      'drush_version'   => $env->getDrushVersion(),
+      'newrelic'        => $newrelic,
       'connection_mode' => $connection_mode,
       'condition'       => $condition,
     ];
