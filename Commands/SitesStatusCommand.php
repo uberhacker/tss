@@ -125,6 +125,7 @@ class SitesStatusCommand extends TerminusCommand {
       'framework'       => 'Framework',
       'created'         => 'Created',
       'frozen'          => 'Frozen',
+      'newrelic'        => 'New Relic',
     ];
 
     $env_rows = array();
@@ -133,7 +134,8 @@ class SitesStatusCommand extends TerminusCommand {
       'environment'     => 'Env',
       'php_version'     => 'PHP',
       'drush_version'   => 'Drush',
-      'newrelic'        => 'New Relic',
+      'redis'           => 'Redis',
+      'solr'            => 'Solr',
       'connection_mode' => 'Mode',
       'condition'       => 'Condition',
     ];
@@ -148,11 +150,12 @@ class SitesStatusCommand extends TerminusCommand {
       }
 
       $site_rows[] = [
-        'name'            => $name,
-        'service_level'   => $site->get('service_level'),
-        'framework'       => $site->get('framework'),
-        'created'         => date('d M Y h:i A', $site->get('created')),
-        'frozen'          => $frozen,
+        'name'          => $name,
+        'service_level' => $site->get('service_level'),
+        'framework'     => $site->get('framework'),
+        'created'       => date('d M Y h:i A', $site->get('created')),
+        'frozen'        => $frozen,
+        'newrelic'      => $site->newrelic() ? 'enabled' : 'disabled',
       ];
 
       // Loop through each environment.
@@ -292,6 +295,7 @@ class SitesStatusCommand extends TerminusCommand {
       $this->input()->env(array('args' => $assoc_args, 'site' => $site))
     );
 
+    // Determine the condition of the environment.
     $condition = 'clean';
     $connection_mode = $env->info('connection_mode');
     if ($connection_mode == 'sftp') {
@@ -301,15 +305,22 @@ class SitesStatusCommand extends TerminusCommand {
       }
     }
 
-    $data = $site->newRelic();
-    $newrelic = !empty($data->account) ? 'enabled' : 'disabled';
+    // Determine Redis and Solr status.
+    $redis = 'unavailable';
+    $solr = 'unavailable';
+    if (!in_array($site->info('service_level'), ['free', 'basic'])) {
+      $connection_info = $env->connectionInfo();
+      $redis = isset($connection_info['redis_host']) ? 'enabled' : 'disabled';
+      $solr = isset($connection_info['solr_host']) ? 'enabled' : 'disabled';
+    }
 
     $env_rows[] = [
       'name'            => $name,
       'environment'     => $environ,
       'php_version'     => $env->info('php_version'),
       'drush_version'   => $env->getDrushVersion(),
-      'newrelic'        => $newrelic,
+      'redis'           => $redis,
+      'solr'            => $solr,
       'connection_mode' => $connection_mode,
       'condition'       => $condition,
     ];
