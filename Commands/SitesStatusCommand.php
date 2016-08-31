@@ -55,8 +55,13 @@ class SitesStatusCommand extends TerminusCommand {
    * [--cached]
    * : Causes the command to return cached sites list instead of retrieving anew
    *
+   * @param array $args       Array of arguments
+   * @param array $assoc_args Array of associative arguments
+   *
    * @subcommand status
    * @alias st
+   *
+   * @return null
    */
   public function status($args, $assoc_args) {
     $options = [
@@ -90,7 +95,10 @@ class SitesStatusCommand extends TerminusCommand {
     }
 
     // Validate the --env argument value, if needed.
-    $env = isset($assoc_args['env']) ? $assoc_args['env'] : 'all';
+    $env = 'all';
+    if (isset($assoc_args['env'])) {
+      $env = $assoc_args['env'];
+    }
     $valid_env = ($env == 'all');
     if (!$valid_env) {
       foreach ($sites as $site) {
@@ -108,7 +116,8 @@ class SitesStatusCommand extends TerminusCommand {
       }
     }
     if (!$valid_env) {
-      $message = 'Invalid --env argument value. Allowed values are dev, test, live or a valid multi-site environment.';
+      $message = 'Invalid --env argument value. Allowed values are dev, test, live or a valid';
+      $message .= ' multi-site environment.';
       $this->failure($message);
     }
 
@@ -138,9 +147,16 @@ class SitesStatusCommand extends TerminusCommand {
     foreach ($sites as $site) {
       $name = $site->get('name');
 
-      $frozen = 'no';
       if ($site->get('frozen')) {
         $frozen = 'yes';
+      } else {
+        $frozen = 'no';
+      }
+
+      if ($site->newrelic()) {
+        $newrelic = 'enabled';
+      } else {
+        $newrelic = 'disabled';
       }
 
       $site_rows[] = [
@@ -149,7 +165,7 @@ class SitesStatusCommand extends TerminusCommand {
         'framework'     => $site->get('framework'),
         'created'       => date('d M Y h:i A', $site->get('created')),
         'frozen'        => $frozen,
-        'newrelic'      => $site->newrelic() ? 'enabled' : 'disabled',
+        'newrelic'      => $newrelic,
       ];
 
       // Loop through each environment.
@@ -162,8 +178,7 @@ class SitesStatusCommand extends TerminusCommand {
           );
           $env_rows = $this->getStatus($args, $env_rows);
         }
-      }
-      else {
+      } else {
         $args = array(
           'name'    => $name,
           'env'     => $env,
@@ -181,12 +196,10 @@ class SitesStatusCommand extends TerminusCommand {
   /**
    * Collect the status data of a specific site and environment.
    *
-   * @param array $args
-   *   The site environment arguments.
-   * @param array $env_rows
-   *   The site environment status data.
-   * @return array $env_rows
-   *   The site environment status data.
+   * @param array $args     The site environment arguments.
+   * @param array $env_rows The site environment status data.
+   *
+   * @return array $env_rows The site environment status data.
    */
   private function getStatus($args, $env_rows) {
     $name = $args['name'];
@@ -220,8 +233,16 @@ class SitesStatusCommand extends TerminusCommand {
     $solr = 'unavailable';
     if (!in_array($site->info('service_level'), ['free', 'basic'])) {
       $connection_info = $env->connectionInfo();
-      $redis = isset($connection_info['redis_host']) ? 'enabled' : 'disabled';
-      $solr = isset($connection_info['solr_host']) ? 'enabled' : 'disabled';
+      if (isset($connection_info['redis_host'])) {
+        $redis = 'enabled';
+      } else {
+        $redis = 'disabled';
+      }
+      if (isset($connection_info['solr_host'])) {
+        $solr = 'enabled';
+      } else {
+        $solr = 'disabled';
+      }
     }
 
     $env_rows[] = [
