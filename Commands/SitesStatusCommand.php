@@ -147,13 +147,13 @@ class SitesStatusCommand extends TerminusCommand {
     foreach ($sites as $site) {
       $name = $site->get('name');
 
-      if ($site->get('frozen')) {
+      if (!is_null($site->get('frozen'))) {
         $frozen = 'yes';
       } else {
         $frozen = 'no';
       }
 
-      if ($site->newrelic()) {
+      if (!is_null($site->newrelic())) {
         $newrelic = 'enabled';
       } else {
         $newrelic = 'disabled';
