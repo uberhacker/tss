@@ -2,9 +2,9 @@
 
 namespace Terminus\Commands;
 
+use Terminus\Collections\Sites;
 use Terminus\Commands\TerminusCommand;
 use Terminus\Exceptions\TerminusException;
-use Terminus\Models\Collections\Sites;
 use Terminus\Models\Organization;
 use Terminus\Models\Site;
 use Terminus\Models\Upstreams;
