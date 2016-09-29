@@ -231,7 +231,7 @@ class SitesStatusCommand extends TerminusCommand {
     // Determine Redis and Solr status.
     $redis = 'unavailable';
     $solr = 'unavailable';
-    if (!in_array($site->info('service_level'), ['free', 'basic'])) {
+    if (!in_array($site->get('service_level'), ['free', 'basic'])) {
       $connection_info = $env->connectionInfo();
       if (isset($connection_info['redis_host'])) {
         $redis = 'enabled';
