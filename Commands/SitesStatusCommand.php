@@ -220,7 +220,7 @@ class SitesStatusCommand extends TerminusCommand {
 
     // Determine the condition of the environment.
     $condition = 'clean';
-    $connection_mode = $env->info('connection_mode');
+    $connection_mode = $env->get('connection_mode');
     if ($connection_mode == 'sftp') {
       $diffstat = (array)$env->diffstat();
       if (!empty($diffstat)) {
@@ -248,7 +248,7 @@ class SitesStatusCommand extends TerminusCommand {
     $env_rows[] = [
       'name'            => $name,
       'environment'     => $environ,
-      'php_version'     => $env->info('php_version'),
+      'php_version'     => $env->get('php_version'),
       'drush_version'   => $env->getDrushVersion(),
       'redis'           => $redis,
       'solr'            => $solr,
